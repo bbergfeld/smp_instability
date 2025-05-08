@@ -28,7 +28,6 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
-sys.path.append('D:\\SMP_stability\\weac')
 import weac as weac
 
 
