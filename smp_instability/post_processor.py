@@ -1,8 +1,25 @@
 
 # -*- coding: utf-8 -*-
 """
-#%% Routines for visualization and combining of instability metrics
-@author: Bergfeld Bastian
+Visualization and Metric Combination for Snowpack Instability Analysis
+----------------------------------------------------------------------
+
+Provides routines for:
+- Loading and combining Reuter2015 snowpack instability model results
+- Calculating composite metrics (e.g., harmonic, geometric, logarithmic means)
+- Visualizing skier-induced stresses, density profiles, and depth-based instability metrics
+
+Key Features:
+- Supports batch loading of instability instances from files or directories
+- Combines metrics into new indices for sensitivity analysis
+- Plotting utilities for stress fields, dual-metric comparisons, and summary plots across profiles
+- Encapsulated plotting tools via `plotter_model` class
+
+Dependencies:
+- numpy, pandas, matplotlib, pickle, logging
+- Custom `weac` package for layered snowpack modeling and stress computation
+
+Author: Bastian Bergfeld
 """
 import logging
 import pickle
