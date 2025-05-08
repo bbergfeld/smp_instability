@@ -23,7 +23,6 @@ Author: Bastian Bergfeld
 """
 import logging
 import pickle
-import sys
 import os
 import numpy as np
 from matplotlib import pyplot as plt
@@ -49,7 +48,7 @@ def load_instability_results(source):
                         loaded_inst_obj.append(pickle.load(f)) 
                 else:
                     raise ValueError(f"Error: {i_source} is a file but not a .pkl file.")
-        else: raise ValueError(f"Error: source is a list but not a correctfilename")
+        else: raise ValueError("Error: source is a list but not a correctfilename")
             
     # Case 1
     elif os.path.isfile(source): 
@@ -73,7 +72,7 @@ def load_instability_results(source):
         else: raise ValueError("No _clustered_profile.pkl files found in the folder.")
     else: raise ValueError("Not a valid source")
     
-    logging.info(f"Instability objects loaded...")
+    logging.info("Instability objects loaded...")
     return(loaded_inst_obj)  # Return list of DataFrames
 
 
@@ -165,15 +164,15 @@ class plotter_model:
         """
         slab_profile = self.model._get_slab_profile_for_weac(wl_id)
         skier = weac.Layered(system='skier', layers=slab_profile)
-        seg_skier = skier.calc_segments(L=model.skier_stability_params["totallength"],
-                                        a=0, m=model.skier_stability_params["skierweight"])['nocrack']
-        C_skier = skier.assemble_and_solve(phi=model.skier_stability_params["inclination"], **seg_skier)
-        xsl_skier, z_skier, xwl_skier = skier.rasterize_solution(C=C_skier, phi=model.skier_stability_params["inclination"], **seg_skier)
+        seg_skier = skier.calc_segments(L=self.model.skier_stability_params["totallength"],
+                                        a=0, m=self.model.skier_stability_params["skierweight"])['nocrack']
+        C_skier = skier.assemble_and_solve(phi=self.model.skier_stability_params["inclination"], **seg_skier)
+        xsl_skier, z_skier, xwl_skier = skier.rasterize_solution(C=C_skier, phi=self.model.skier_stability_params["inclination"], **seg_skier)
         weac.plot.deformed(skier, xsl=xsl_skier, xwl=xwl_skier, z=z_skier,
-                   phi=model.skier_stability_params["inclination"], window=400, scale=100, aspect=2,
+                   phi=self.model.skier_stability_params["inclination"], window=400, scale=100, aspect=2,
                    field=field)
     
-        return(ax)
+        return()
     
     def skier_stresses_in_wl(self, wl_id):
         """
@@ -290,14 +289,14 @@ class plotter_model:
             plt.savefig(self.model.file_path[:-4]+"_stability_metrics_with_depth.png")
         return (fig, axes)
     
-    @classmethod
-    def run(cls, instance):
-        """Creates an instance and runs all necessary computations."""
-        logging.info("starting PostProcessor...")
-        compute_harmonic_mean(instance, "S_Reuter2015", "rc_Reuter2015")
-        compute_logarithmic_mean(instance, "S_Reuter2015", "rc_Reuter2015")
-        compute_geometric_mean(instance, "S_Reuter2015", "rc_Reuter2015")
-        compute_reziprocal_sum(instance, "S_Reuter2015", "rc_Reuter2015")
-        compute_logarithmic_sensitivity(instance, "S_Reuter2015", "rc_Reuter2015")
-        plotter.density_vs_sth(instance, ax2_metric="logarithmic_sensitivity")  
-        return instance       
+    # @classmethod
+    # def run(cls, instance):
+    #     """Creates an instance and runs all necessary computations."""
+    #     logging.info("starting PostProcessor...")
+    #     compute_harmonic_mean(instance, "S_Reuter2015", "rc_Reuter2015")
+    #     compute_logarithmic_mean(instance, "S_Reuter2015", "rc_Reuter2015")
+    #     compute_geometric_mean(instance, "S_Reuter2015", "rc_Reuter2015")
+    #     compute_reziprocal_sum(instance, "S_Reuter2015", "rc_Reuter2015")
+    #     compute_logarithmic_sensitivity(instance, "S_Reuter2015", "rc_Reuter2015")
+    #     plotter.density_vs_sth(instance, ax2_metric="logarithmic_sensitivity")  
+    #     return instance       

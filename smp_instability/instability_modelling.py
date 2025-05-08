@@ -133,7 +133,7 @@ class R2015_point_instability:
             with open(new_filename, "wb") as f:
                 pickle.dump(self.stab, f)
             logging.info(f"   Saved: {new_filename}")
-        except: raise AssertionError(f"Error: saving instability dataframe failed")
+        except: raise AssertionError("Error: saving instability dataframe failed")
             
     def save_instance(self):
         """Saves a class instance as a pickle file, modifying the filename."""
@@ -142,7 +142,7 @@ class R2015_point_instability:
             with open(new_filename, "wb") as f:
                 pickle.dump(self, f)
             logging.info(f"   Saved: {new_filename}")
-        except: raise AssertionError(f"Error: saving class instance failed")
+        except: raise AssertionError("Error: saving class instance failed")
     
     @classmethod
     def run(cls, profile, skier_stability_params=None, PST_params=None, save_2_pkl = False):
@@ -235,5 +235,5 @@ class R2015_point_instability:
                 
         else: raise ValueError("Not a valid source")
         
-        logging.info(f"Instability modelling finished...")
+        logging.info("Instability modelling finished...")
         return(stab_profiles)  # Return list of DataFrames

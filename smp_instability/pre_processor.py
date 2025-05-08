@@ -147,10 +147,7 @@ class PreProcessor:
         derivatives["cluster_id"] = labels
     
         # Determine boundaries between clusters to get layering:
-        x = derivatives["distance"].values
-        boundaries = [x[0]] + [x[i] for i in range(1, len(labels)) if labels[i] != labels[i - 1]] + [x[-1]]
         derivatives["layer_id"] = (derivatives["cluster_id"] != derivatives["cluster_id"].shift()).cumsum()
-
         layered_derivatives = derivatives.groupby('layer_id').mean()
         layered_derivatives["distance"] = derivatives.groupby('layer_id').min().distance # distance is the lower boundary in the snowpack, 0 is surface
         layered_derivatives.profile_bottom = derivatives.profile_bottom
@@ -314,7 +311,6 @@ class PreProcessor:
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = {executor.submit(cls.run,i_pnt, save_2_pkl): i_pnt for i_pnt in pnts}
                 for future in concurrent.futures.as_completed(futures):
-                    profile = futures[future]  # Get the associated file
                     try:
                         df_profile = future.result()  # Get DataFrame result
                         results.append(df_profile)  # Store DataFrame in results list
