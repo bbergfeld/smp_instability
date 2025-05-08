@@ -4,19 +4,15 @@
 @author: Bergfeld Bastian
 """
 
-import sys
 import os
 import concurrent.futures
 import numpy as np
 import pandas as pd
-import functools
 import logging
 import pickle
 
-sys.path.append('D:\\SMP_stability\\weac')
 import weac as weac
-sys.path.append('D:\\SMP_stability')
-from logging_class import LoggerConfig, error_handling_decorator
+from smp_instability.logging_class import error_handling_decorator
 
     
 
@@ -97,6 +93,7 @@ class R2015_point_instability:
         logging.info(f"   compute_skier_stability_S for {self.profile.attrs["name"]} {self.profile.shape[0]} layers")
 
         max_tau_skier = self.profile.index.to_series().apply(self._compute_max_tau)
+        self.stab["max_shear_stress"] =  max_tau_skier
         self.stab["S_Reuter2015"] = self.profile["JS1999_sigma_macro"] * 1e3 / max_tau_skier
 
 #---------- rc computation --------------------------------    
