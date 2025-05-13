@@ -95,6 +95,9 @@ def compute_reziprocal_sum(instability_instance, metric_1, metric_2):
 def compute_logarithmic_sensitivity(instability_instance, metric_1, metric_2):
     I1,I2 = instability_instance.stab[metric_1], instability_instance.stab[metric_2]
     instability_instance.stab["logarithmic_sensitivity"] = np.exp(np.log(I1)+np.log(I2))
+def compute_euclidian_distance(instability_instance, metric_1, metric_2):
+    I1,I2 = instability_instance.stab[metric_1], instability_instance.stab[metric_2]
+    instability_instance.stab["euclidian_distance"] = np.sqrt(I1**2+I2**2)
     
 def scale_metric(instability_instance, method='mean', postfix='_scaled', exclude_cols=['depthTop', 'thickness']):
     stats = {'mean': instability_instance.stab.mean,
@@ -110,7 +113,42 @@ def scale_metric(instability_instance, method='mean', postfix='_scaled', exclude
         instability_instance.stab[col + postfix] = instability_instance.stab[col] / scale if scale != 0 else float('nan')
         
 
+def robust_scaler(instability_instance, lower_quantile=0.1, upper_quantile=0.6, clip_quantile=0.9):
+    """
+    Skaliert alle metriken robust (aber ohne Zentrierung),
+    sodass keine negativen Werte entstehen. Hohe Ausreißer werden geclippt.
+    
+    Args:
+        model_instance.stab (pd.DataFrame): Der Input-DataFrame.
+        lower_quantile (float): Unteres Quantil (z. B. 0.1).
+        upper_quantile (float): Oberes Quantil (z. B. 0.9).
+        clip_quantile (float): Clipping-Schwelle für hohe Ausreißer.
+    
+    Returns:
+        adds scaled columns to the stab dataframe
+    """
+    df = instability_instance.stab
+    columns_to_scale = [col for col in df.columns if col not in ['depthTop', 'Thickness']]
 
+    for col in columns_to_scale:
+        x = df[col].values
+
+        # IQR ohne Zentrierung (kein Abzug von Median)
+        q_low = np.quantile(x, lower_quantile)
+        q_high = np.quantile(x, upper_quantile)
+        iqr = q_high - q_low
+        iqr = iqr if iqr != 0 else 1.0
+
+        # Skalieren ohne Median-Abzug
+        x_scaled = x / iqr
+
+        # Clipping (falls gewünscht)
+        upper_clip = np.quantile(x_scaled, clip_quantile)
+        x_scaled = np.clip(x_scaled, None, upper_clip)
+
+        df[f"{col}_scaled"] = x_scaled
+
+    return df
 
 def plot_averaged_from_profiles(models, metrics, window_size=2, overlap=50, how_to_average = "median", average_window = 10,save_fig=False,  log_x = None):
     """ models: list of instability instances
@@ -304,6 +342,18 @@ class plotter_model:
             plt.savefig(self.model.file_path[:-4]+"_stability_metrics_with_depth.png")
         return (fig, axes)
     
+    
+    def hazard_map(self, x = "depthTop", y = "logarithmic_sensitivity", ax1=None):
+        """
+            to be written
+        """
+        if ax1 is None:
+            fig, ax = plt.subplots(figsize=(6, 8))
+        self.model.stab.plot.scatter( x=x,y=y,figsize=(8, 6),c= "C1",ax = ax,label="logarithmic_sensitivity",title="Hazard map")
+        ax.invert_yaxis()
+        return (fig, ax)    
+        
+        
     # @classmethod
     # def run(cls, instance):
     #     """Creates an instance and runs all necessary computations."""
