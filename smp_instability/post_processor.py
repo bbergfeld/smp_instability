@@ -95,6 +95,21 @@ def compute_reziprocal_sum(instability_instance, metric_1, metric_2):
 def compute_logarithmic_sensitivity(instability_instance, metric_1, metric_2):
     I1,I2 = instability_instance.stab[metric_1], instability_instance.stab[metric_2]
     instability_instance.stab["logarithmic_sensitivity"] = np.exp(np.log(I1)+np.log(I2))
+    
+def scale_metric(instability_instance, method='mean', postfix='_scaled', exclude_cols=['depthTop', 'thickness']):
+    stats = {'mean': instability_instance.stab.mean,
+             'median': instability_instance.stab.median,
+             'min': instability_instance.stab.min,
+             'max': instability_instance.stab.max }
+
+    if method not in stats:
+        raise ValueError(f"Unsupported method: {method}")
+
+    for col in instability_instance.stab.columns.difference(exclude_cols):
+        scale = stats[method]()[col]
+        instability_instance.stab[col + postfix] = instability_instance.stab[col] / scale if scale != 0 else float('nan')
+        
+
 
 
 def plot_averaged_from_profiles(models, metrics, window_size=2, overlap=50, how_to_average = "median", average_window = 10,save_fig=False,  log_x = None):
