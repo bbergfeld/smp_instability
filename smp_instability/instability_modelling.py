@@ -52,7 +52,7 @@ class R2015_point_instability:
         self.skier_stability_params = skier_stability_params or {
             "totallength": 4e4, "inclination": -38, "skierweight": 80, "slab_load": True}
         self.PST_params = PST_params or {
-            "system": "pst-", "totallength": 4e3, "inclination": -38, "max_cracklength": 2e3, "num_da": 500}
+            "system": "pst-", "totallength": 4e3, "inclination": 0, "max_cracklength": 2e3, "num_da": 500}
         self.stab = self.profile[["depthTop","thickness"]].copy(deep=True)
         self.stab.attrs = self.profile.attrs.copy()
         subset = {k: self.profile.attrs[k] for k in ['name', 'filepath'] if k in self.profile.attrs}
