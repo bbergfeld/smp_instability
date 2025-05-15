@@ -98,6 +98,11 @@ def compute_logarithmic_sensitivity(instability_instance, metric_1, metric_2):
 def compute_euclidian_distance(instability_instance, metric_1, metric_2):
     I1,I2 = instability_instance.stab[metric_1], instability_instance.stab[metric_2]
     instability_instance.stab["euclidian_distance"] = np.sqrt(I1**2+I2**2)
+def compute_weighted_geometric_mean(instability_instance, metric_1, metric_2):
+    w1,w2 = 0.8, 0.2
+    I1,I2 = instability_instance.stab[metric_1], instability_instance.stab[metric_2]
+    scale_factor = np.sqrt(I1.mean() * I2.mean())
+    instability_instance.stab["weighted_geometric_mean"] = (I1**w1) * (I2**w2) / scale_factor
     
 def scale_metric(instability_instance, method='mean', postfix='_scaled', exclude_cols=['depthTop', 'thickness']):
     stats = {'mean': instability_instance.stab.mean,
@@ -343,15 +348,22 @@ class plotter_model:
         return (fig, axes)
     
     
-    def hazard_map(self, x = "depthTop", y = "logarithmic_sensitivity", ax1=None):
+    def hazard_map(self, x = "depthTop", y = "logarithmic_sensitivity", color = "CR2020_ssa", ax1=None):
         """
             to be written
         """
         if ax1 is None:
-            fig, ax = plt.subplots(figsize=(6, 8))
-        self.model.stab.plot.scatter( x=x,y=y,figsize=(8, 6),c= "C1",ax = ax,label="logarithmic_sensitivity",title="Hazard map")
-        ax.invert_yaxis()
-        return (fig, ax)    
+            fig, ax1 = plt.subplots(figsize=(6, 8))
+            
+        self.model.stab.plot.scatter( x=x,y=y,c=self.model.profile[color],ax = ax1,title="Hazard map", colorbar=False)
+        sc = ax1.collections[0]
+        cbar = plt.colorbar(sc, ax=ax1)
+        cbar.set_label(color)  # <-- Set the colorbar title here
+        ax1.set_ylabel("Instability ("+y+")")
+        ax1.set_xlabel("Slab thickness (mm)")
+
+        ax1.invert_yaxis()
+        return (fig, ax1)    
         
         
     # @classmethod
