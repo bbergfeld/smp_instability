@@ -26,20 +26,41 @@ from smp_instability.logging_class import LoggerConfig
 
 #%%
 
-def plot_smp_instability(pnt_file, output_folder):
+def plot_instability_profile(pnt_file, output_folder):
     
     """
     pipline to attain an instability plot from a pnt file
     
-    pnt_file (str): file pat to the input pnt file
+    pnt_file (str): file path to the input pnt file
     output_folder (str): directory to save resulting plots
     """
     LoggerConfig.setup_logging(log_to_file = True, log_filename=pnt_file[:-4] + ".log")
     profile = PreProcessor.run(pnt_file, save_2_pkl = True)
     model = R2015_point_instability.run(profile, save_2_pkl = True)
-    post_processor.compute_logarithmic_sensitivity(model, "S_Reuter2015", "rc_Reuter2015")
+    post_processor.robust_scaler(model)
+    post_processor.compute_harmonic_mean(model, "S_Reuter2015_scaled", "rc_Reuter2015_scaled")
+    
+    plotter = post_processor.plotter_model(model)
+    fig,_,_ = plotter.density_vs_sth(ax2_metric='harmonic_mean')
+    fig.savefig(output_folder + "\\density_and_instability_profile_" + pnt_file.split("\\")[-1][:-4]+ ".png")
+    return(True)
+
+
+def plot_hazard_map(pnt_file, output_folder):
+    
+    """
+    pipline to attain a hazard plot from a pnt file
+    
+    pnt_file (str): file path to the input pnt file
+    output_folder (str): directory to save resulting plots
+    """
+    LoggerConfig.setup_logging(log_to_file = True, log_filename=pnt_file[:-4] + ".log")
+    profile = PreProcessor.run(pnt_file, save_2_pkl = True)
+    model = R2015_point_instability.run(profile, save_2_pkl = True)
+    post_processor.robust_scaler(model)
+    post_processor.compute_harmonic_mean(model, "S_Reuter2015_scaled", "rc_Reuter2015_scaled")
 
     plotter = post_processor.plotter_model(model)
-    fig,_,_ = plotter.density_vs_sth(ax2_metric='logarithmic_sensitivity')
-    fig.savefig(output_folder + "\\density_vs_sth.png")
+    fig,_ = plotter.hazard_map()
+    fig.savefig(output_folder + "\\hazard_map_" + pnt_file.split("\\")[-1][:-4]+ ".png")
     return(True)

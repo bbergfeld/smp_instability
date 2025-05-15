@@ -348,7 +348,7 @@ class plotter_model:
         return (fig, axes)
     
     
-    def hazard_map(self, x = "depthTop", y = "logarithmic_sensitivity", color = "CR2020_ssa", ax1=None):
+    def hazard_map(self, x = "depthTop", y = "harmonic_mean", color = "CR2020_ssa", ax1=None):
         """
             to be written
         """
