@@ -13,13 +13,13 @@ license = {text = "GNU"}
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "numpy (<2.0.0)",
+    "numpy (<2.0.0)",  
     "pandas (>=2.2.3,<3.0.0)",
     "matplotlib (>=3.10.1,<4.0.0)",
-    "scikit-learn (>=1.6.1,<2.0.0)",
-    "scipy (>=1.15.2,<2.0.0)",
+    "scikit-learn",
+    "scipy" ,
     "snowmicropyn (>=1.2.1,<2.0.0)",
-    "weac (>=2.6.1,<3.0.0)",
+    "weac (>2.0.0)", 
     "snow-models @ git+https://github.com/bbergfeld/snow_models"
 ]
 
