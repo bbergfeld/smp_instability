@@ -307,7 +307,7 @@ class plotter_model:
         ax1.tick_params(axis='x', colors=ax1_color)
         ax1.grid(True, linestyle="--", alpha=0.2)
     
-        ax2.set_xlabel(ax2_metric, color="red")
+        ax2.set_xlabel("Instability", color="red")
         ax2.set_xlim(0, ax2_xmax)  # Ensure full density range + padding
         ax2.invert_xaxis()  # Depth increases downward
         ax2.tick_params(axis='x', colors=ax2_color)
@@ -350,7 +350,8 @@ class plotter_model:
     
     def hazard_map(self, x = "depthTop", y = "harmonic_mean", color = "CR2020_ssa", ax1=None):
         """
-            to be written
+            plots a hazard map
+                - color of markers can be choosen. default is SSA
         """
         if ax1 is None:
             fig, ax1 = plt.subplots(figsize=(6, 8))
@@ -363,8 +364,54 @@ class plotter_model:
         ax1.set_xlabel("Slab thickness (mm)")
 
         ax1.invert_yaxis()
-        return (fig, ax1)    
+        return (fig, ax1)  
+    
+    
+    
+    def instability_bar(self, n_layers=3, ax=None):
+        """
+            plots an instability estimate for most unstable slab-weak layer combinations.
+            n_layers: number of weakest layers to be shown
+        """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 2))
+            
+        weak_layer_df = self.model.stab.drop(index=0).sort_values(by="harmonic_mean", ascending=True).head(n_layers)
         
+        instablilty_min, instablilty_max= 0,self.model.stab.harmonic_mean.max()
+        # Erzeuge eine Dummy-Farbskala (z. B. 0–100)
+        norm = plt.Normalize(vmin=instablilty_min, vmax=instablilty_max)
+        cmap = plt.get_cmap("jet_r")
+        fig.subplots_adjust(top=0.2 + 0.2*n_layers)
+        
+        # Füge eine horizontale Colorbar ein
+        cbar = fig.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmap),
+            cax=ax,
+            orientation='horizontal'
+        )
+        
+        cbar.set_label("SMP-Stability")
+        cbar.set_ticks([instablilty_min, instablilty_max])
+        cbar.set_ticklabels(['unstable', 'stable'])
+        
+        
+        values = (weak_layer_df.harmonic_mean/instablilty_max).to_list()
+        depth = weak_layer_df.depthTop.to_list()
+        labels = ["WL"+str(i+1)+"("+str(depth[i]/10)+")" for i in range(n_layers)]
+        
+        for i, (wl, label) in enumerate(zip(values, labels)):
+            ax.annotate(
+                label,
+                xy=(wl, 1),           # Punkt auf der Colorbar
+                xytext=(wl, 1.3+0.1*i),     # Textposition darüber
+                textcoords='data',
+                ha='center',
+                arrowprops=dict(arrowstyle='->', color='black')
+            )
+    
+        return (fig, ax)  
+
         
     # @classmethod
     # def run(cls, instance):
