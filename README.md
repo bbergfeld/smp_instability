@@ -50,12 +50,12 @@ pip install git+https://github.com/bbergfeld/smp_instability.git
 
 Example usage to derive instability from a pnt file:
 ```python
-from smp_instability.pipelines import plot_smp_instability
+from smp_instability.pipelines import plot_instability_profile
 
-pnt_file = 'D:\\Github_repos\\smp_instability\\smp_instability\\.pnt_data\\SMP1_FILE0003.pnt'
-output_folder = 'D:\\example_output_folder_for_smp_2_instability'
+pnt_file = 'filepath_to_pnt_file'
+output_folder = 'outputfolder_to_save_plots'
 
-plot_smp_instability(pnt_file, output_folder)
+plot_instability_profile(pnt_file, output_folder)
 
 
 ```
